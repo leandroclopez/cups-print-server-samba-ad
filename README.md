@@ -178,6 +178,16 @@ Para uma impressora **HP**, o roteiro completo (filtro, receptor, fila, porta e 
 | O `pnputil` falha com "fornecedor de um catálogo assinado Authenticode ainda não foi considerado confiável" | O certificado do fabricante do driver não está em Fornecedores Confiáveis | Importe o certificado na GPO (veja o [doc 08](docs/08-adicionar-impressora-hp.md)) |
 | A impressora não aparece depois de incluir o PC no grupo `_PCs` | O grupo de computador só entra no token com o PC reiniciado | Reinicie o PC e confira com `gpresult /scope computer /r` |
 | Não consegue remover fila e driver logo em seguida | O spooler segura os itens | Espere, ou `Restart-Service Spooler` e aguarde ~20 s |
+| Envios de impressão para HP não saem | Impressão pausada após desligamento inadequado | Sequência de comandos: 
+#Comandos no linux - lembrar de colocar o "sudo" na frente se der erro no comando
+
+cancel -a faturamento-hp
+lpstat -o faturamento-hp          # deve voltar vazio
+cupsenable faturamento-hp
+lpstat -p faturamento-hp          # deve mostrar "idle. enabled"
+tail -f /var/log/cups/error_log
+
+lpadmin -p faturamento-hp -o printer-error-policy=retry-job |
 
 Mais casos em [`docs/04-problemas-comuns.md`](docs/04-problemas-comuns.md).
 
